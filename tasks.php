@@ -5,7 +5,15 @@ error_reporting(E_ALL);
 
 session_start();
 header('Content-Type: application/json');
-require 'config.php';
+require_once __DIR__ . '/config.php'; 
+
+if (!isset($pdo)) {
+    error_log('PDO is not set!');
+    http_response_code(500);
+    echo json_encode(['error' => 'PDO connection not initialized.']);
+    exit;
+}
+
 
 $method = $_SERVER['REQUEST_METHOD'];
 
