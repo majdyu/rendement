@@ -1,7 +1,7 @@
 <?php
 $host = 'controle-rondement-db.mysql.database.azure.com';
-$username = 'majd007@controle-rondement-db'; // Include @servername for Azure MySQL
-$password = '{your_password}'; // Replace with your actual MySQL password
+$username = 'majd007'; // Include @servername for Azure MySQL
+$password = 'vicomteA10!'; // Replace with your actual MySQL password
 $database = 'task_manager'; // Matches the database you created
 $caCertPath = '/home/site/wwwroot/cert/DigiCertGlobalRootCA.crt.pem'; // Path in Azure App Service
 
