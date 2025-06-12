@@ -2,30 +2,29 @@
 // Define database connection values
 $host = 'controle-rondement-db.mysql.database.azure.com';
 $username = 'majd007';
-$password = 'vicomteA10!'; // Replace with your secure password
+$password = 'vicomteA10!'; // Replace with your actual password
 $database = 'task_manager';
 $port = 3306;
+$caCertPath = __DIR__ . '/DigiCertGlobalRootCA.crt.pem'; // Path to CA certificate
 
-// Path to Azure's CA certificate (Download it from Azure portal if needed)
-$caCertPath = __DIR__ . '/BaltimoreCyberTrustRoot.crt.pem'; // Make sure the file exists here
-
-// Initialize MySQLi
+// Initialize MySQLi connection
 $conn = mysqli_init();
 
-// Configure SSL
-mysqli_ssl_set($conn, NULL, NULL, $caCertPath, NULL, NULL);
+// Set SSL options
+mysqli_ssl_set($conn, null, null, $caCertPath, null, null);
 
 // Establish secure connection
-if (!mysqli_real_connect($conn, $host, $username, $password, $database, $port, NULL, MYSQLI_CLIENT_SSL)) {
-    die("Connection failed: " . mysqli_connect_error());
+if (!mysqli_real_connect($conn, $host, $username, $password, $database, $port, null, MYSQLI_CLIENT_SSL)) {
+    http_response_code(500);
+    die("Secure connection failed: " . mysqli_connect_error());
 }
 
-// Optional: Set charset
+// Set character set to UTF-8
 mysqli_set_charset($conn, "utf8");
 
-// Optional: Make it globally accessible
+// Store connection globally
 $GLOBALS['conn'] = $conn;
 
-// Connection success message (can be removed in production)
-echo "Connected successfully via SSL.";
+// Optional: Comment out this line in production
+// echo "Connected successfully via SSL.";
 ?>
