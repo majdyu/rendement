@@ -1,30 +1,24 @@
 <?php
 // Define database connection values
 $host = 'controle-rondement-db.mysql.database.azure.com';
-$username = 'majd007';
-$password = 'vicomteA10!'; // Replace with your actual password
-$database = 'task_manager';
+$db   = 'task_manager';
+$user = 'majd007';
+$pass = 'vicomteA10!';
 $port = 3306;
-$caCertPath = __DIR__ . '/DigiCertGlobalRootCA.crt.pem'; // Path to CA certificate
+$caCertPath = __DIR__ . '/DigiCertGlobalRootCA.crt.pem';
 
-// Initialize MySQLi connection
-$conn = mysqli_init();
+// DSN with SSL
+$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4;sslmode=VERIFY_CA;sslca=$caCertPath";
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::MYSQL_ATTR_SSL_CA       => $caCertPath,
+];
 
-// Set SSL options
-mysqli_ssl_set($conn, null, null, $caCertPath, null, null);
-
-// Establish secure connection
-if (!mysqli_real_connect($conn, $host, $username, $password, $database, $port, null, MYSQLI_CLIENT_SSL)) {
+try {
+    $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (PDOException $e) {
     http_response_code(500);
-    die("Secure connection failed: " . mysqli_connect_error());
+    die(json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]));
 }
-
-// Set character set to UTF-8
-mysqli_set_charset($conn, "utf8");
-
-// Store connection globally
-$GLOBALS['conn'] = $conn;
-
-// Optional: Comment out this line in production
-// echo "Connected successfully via SSL.";
 ?>
