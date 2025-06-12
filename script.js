@@ -37,7 +37,7 @@ function truncateComment(comment) {
 
 function toggleTaskDone(id, checked) {
   console.log(`Toggling task ${id} to ${checked}`);
-  fetch('/controle_rondement/tasks.php', {
+  fetch('./tasks.php', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ id: parseInt(id), termine: checked })
@@ -52,7 +52,7 @@ function toggleTaskDone(id, checked) {
 
 function fetchTasks() {
   console.log('Fetching tasks...');
-  fetch('/controle_rondement/tasks.php')
+  fetch('./tasks.php')
     .then(response => {
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       return response.json();
@@ -178,7 +178,7 @@ form.onsubmit = e => {
   };
   console.log('Submitting task:', task);
 
-  fetch('/controle_rondement/tasks.php', {
+  fetch('./tasks.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(task)
@@ -250,7 +250,7 @@ taskTableBody.onclick = e => {
   if (e.target.matches('.delete') && userRole === 'admin') {
     if (confirm('Supprimer cette tâche ?')) {
       console.log(`Deleting task ${id}`);
-      fetch('/controle_rondement/tasks.php', {
+      fetch('./tasks.php', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: parseInt(id) })
