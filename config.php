@@ -1,6 +1,6 @@
 <?php
 $host = 'controle-rondement-db.mysql.database.azure.com';
-$db   = 'tsk_manager';
+$db   = 'task_manager';
 $user = 'majd007';
 $pass = 'vicomteA10!';
 $charset = 'utf8mb4';
