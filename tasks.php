@@ -4,8 +4,13 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
+header('Access-Control-Allow-Origin: *'); // Allow CORS for testing (remove in production)
 header('Content-Type: application/json');
-require_once __DIR__ . '/config.php'; 
+require_once __DIR__ . '/config.php';
+
+// Log the incoming request to diagnose 404
+$requestData = file_get_contents('php://input');
+error_log("Received request - Method: " . $_SERVER['REQUEST_METHOD'] . " URL: " . $_SERVER['REQUEST_URI'] . " Data: " . $requestData);
 
 if (!isset($pdo)) {
     error_log('PDO is not set!');
@@ -13,7 +18,6 @@ if (!isset($pdo)) {
     echo json_encode(['error' => 'PDO connection not initialized.']);
     exit;
 }
-
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -32,7 +36,7 @@ switch ($method) {
 
     case 'POST':
         try {
-            $data = json_decode(file_get_contents('php://input'), true);
+            $data = json_decode($requestData, true);
             error_log("POST Data: " . print_r($data, true));
             $id = isset($data['id']) ? (int)$data['id'] : null;
             $date = $data['date'];
@@ -48,9 +52,7 @@ switch ($method) {
             }
 
             if ($id) {
-                // Editing an existing task
                 if (isset($_SESSION['role']) && $_SESSION['role'] === 'assistant') {
-                    // Assistants can only update reelle and commentaire
                     $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ?");
                     $stmt->execute([$id]);
                     $existingTask = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -65,12 +67,10 @@ switch ($method) {
                     $stmt = $pdo->prepare("UPDATE tasks SET reelle = ?, commentaire = ? WHERE id = ?");
                     $stmt->execute([$reelle, $commentaire, $id]);
                 } else {
-                    // Admin can update all fields
                     $stmt = $pdo->prepare("UPDATE tasks SET date = ?, ouvrier = ?, tache = ?, estimee = ?, reelle = ?, commentaire = ?, termine = ? WHERE id = ?");
                     $stmt->execute([$date, $ouvrier, $tache, $estimee, $reelle, $commentaire, $termine, $id]);
                 }
             } else {
-                // Adding a new task (allowed for both roles)
                 $stmt = $pdo->prepare("SELECT COUNT(*) FROM tasks WHERE date = ?");
                 $stmt->execute([$date]);
                 $numero = $stmt->fetchColumn() + 1;
@@ -90,7 +90,7 @@ switch ($method) {
 
     case 'PUT':
         try {
-            $data = json_decode(file_get_contents('php://input'), true);
+            $data = json_decode($requestData, true);
             $id = (int)$data['id'];
             $termine = (bool)$data['termine'];
             $stmt = $pdo->prepare("UPDATE tasks SET termine = ? WHERE id = ?");
@@ -110,7 +110,7 @@ switch ($method) {
                 echo json_encode(['error' => 'Accès interdit']);
                 exit();
             }
-            $data = json_decode(file_get_contents('php://input'), true);
+            $data = json_decode($requestData, true);
             $id = (int)$data['id'];
             $stmt = $pdo->prepare("DELETE FROM tasks WHERE id = ?");
             $stmt->execute([$id]);
