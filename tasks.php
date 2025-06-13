@@ -38,7 +38,7 @@ switch ($method) {
         try {
             $data = json_decode($requestData, true);
             error_log("POST Data: " . print_r($data, true));
-            $id = isset($data['id']) ? (int)$data['id'] : null;
+            //$id = isset($data['id']) ? (int)$data['id'] : null;
             $date = $data['date'];
             $ouvrier = $data['ouvrier'];
             $tache = $data['tache'];
