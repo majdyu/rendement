@@ -38,14 +38,17 @@ switch ($method) {
         try {
             $data = json_decode($requestData, true);
             error_log("POST Data: " . print_r($data, true));
-            //$id = isset($data['id']) ? (int)$data['id'] : null;
+
+            $id = isset($data['id']) && !empty($data['id']) ? (int)$data['id'] : null;
             $date = $data['date'];
             $ouvrier = $data['ouvrier'];
             $tache = $data['tache'];
             $estimee = (float)$data['estimee'];
             $reelle = (float)$data['reelle'];
             $commentaire = $data['commentaire'] ?? '';
-            $termine = isset($data['termine']) ? (bool)$data['termine'] : false;
+            $termine = isset($data['termine']) ? (int)((bool)$data['termine']) : 0;
+
+
 
             if (!$date || !$ouvrier || !$tache || !$estimee || !$reelle) {
                 throw new Exception("Données incomplètes");
