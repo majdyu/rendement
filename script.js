@@ -178,8 +178,22 @@ form.onsubmit = e => {
       task.estimee = parseFloat(data.estimee);
       task.reelle = parseFloat(data.reelle);
       task.commentaire = data.commentaire || '';
-      task.termine = tasks.find(t => t.id === taskId)?.termine || false;
+      task.termine = tasks.find(t => t.id === taskId)?.termine || 0;
     } else if (userRole === 'assistant') {
+      const originalTask = tasks.find(t => t.id === taskId);
+      if (!originalTask) {
+        alert("Erreur : tâche introuvable !");
+        return;
+      }
+
+      // Conserver les champs non modifiables depuis la version originale
+      task.date = originalTask.date;
+      task.ouvrier = originalTask.ouvrier;
+      task.tache = originalTask.tache;
+      task.estimee = originalTask.estimee;
+      task.termine = originalTask.termine;
+
+      // Ajouter les champs modifiables par l'assistant
       task.reelle = parseFloat(data.reelle);
       task.commentaire = data.commentaire || '';
     }
