@@ -171,7 +171,6 @@ form.onsubmit = e => {
   const task = { id: taskId };
 
   if (isEditing) {
-    if (userRole === 'admin') {
       task.date = data.date;
       task.ouvrier = data.ouvrier;
       task.tache = data.tache;
@@ -179,24 +178,6 @@ form.onsubmit = e => {
       task.reelle = parseFloat(data.reelle);
       task.commentaire = data.commentaire || '';
       task.termine = tasks.find(t => t.id === taskId)?.termine || 0;
-    } else if (userRole === 'assistant') {
-      const originalTask = tasks.find(t => t.id === taskId);
-      if (!originalTask) {
-        alert("Erreur : tâche introuvable !");
-        return;
-      }
-
-      // Conserver les champs non modifiables depuis la version originale
-      task.date = originalTask.date;
-      task.ouvrier = originalTask.ouvrier;
-      task.tache = originalTask.tache;
-      task.estimee = originalTask.estimee;
-      task.termine = originalTask.termine;
-
-      // Ajouter les champs modifiables par l'assistant
-      task.reelle = parseFloat(data.reelle);
-      task.commentaire = data.commentaire || '';
-    }
   } else {
     // Ajout d'une nouvelle tâche (admin ou assistant)
     task.date = data.date;
