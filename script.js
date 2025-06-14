@@ -186,7 +186,7 @@ form.onsubmit = e => {
     task.estimee = parseFloat(data.estimee);
     task.reelle = parseFloat(data.reelle);
     task.commentaire = data.commentaire || '';
-    task.termine = false;
+    task.termine = 0;
   }
 
   console.log('Submitting task:', task);
