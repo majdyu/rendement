@@ -10,7 +10,8 @@ if (!isset($_SESSION['user']) || $_SESSION['role'] !== 'admin') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suivi des Tâches - Admin</title>
+    <link rel="shortcut icon" href="logo.png" type="image/png">
+    <title>Suivi - Controleur de Rendement</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body data-role="admin">

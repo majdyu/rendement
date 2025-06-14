@@ -166,16 +166,34 @@ form.onsubmit = e => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(form).entries());
   const isEditing = data.id !== '';
-  const task = {
-    id: isEditing ? parseInt(data.id) : null,
-    date: data.date,
-    ouvrier: data.ouvrier,
-    tache: data.tache,
-    estimee: parseFloat(data.estimee),
-    reelle: parseFloat(data.reelle),
-    commentaire: data.commentaire || '',
-    termine: isEditing ? tasks.find(t => t.id === parseInt(data.id))?.termine || false : false
-  };
+  const taskId = isEditing ? parseInt(data.id) : null;
+
+  const task = { id: taskId };
+
+  if (isEditing) {
+    if (userRole === 'admin') {
+      task.date = data.date;
+      task.ouvrier = data.ouvrier;
+      task.tache = data.tache;
+      task.estimee = parseFloat(data.estimee);
+      task.reelle = parseFloat(data.reelle);
+      task.commentaire = data.commentaire || '';
+      task.termine = tasks.find(t => t.id === taskId)?.termine || false;
+    } else if (userRole === 'assistant') {
+      task.reelle = parseFloat(data.reelle);
+      task.commentaire = data.commentaire || '';
+    }
+  } else {
+    // Ajout d'une nouvelle tâche (admin ou assistant)
+    task.date = data.date;
+    task.ouvrier = data.ouvrier;
+    task.tache = data.tache;
+    task.estimee = parseFloat(data.estimee);
+    task.reelle = parseFloat(data.reelle);
+    task.commentaire = data.commentaire || '';
+    task.termine = false;
+  }
+
   console.log('Submitting task:', task);
 
   fetch('./tasks.php', {
@@ -194,6 +212,7 @@ form.onsubmit = e => {
     })
     .catch(error => console.error('Error saving task:', error));
 };
+
 
 taskTableBody.onclick = e => {
   const id = e.target.dataset.id;
