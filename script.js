@@ -166,47 +166,16 @@ form.onsubmit = e => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(form).entries());
   const isEditing = data.id !== '';
-  const taskId = isEditing ? parseInt(data.id) : null;
-
-  const task = { id: taskId };
-
-  if (isEditing) {
-    if (userRole === 'admin') {
-      task.date = data.date;
-      task.ouvrier = data.ouvrier;
-      task.tache = data.tache;
-      task.estimee = parseFloat(data.estimee);
-      task.reelle = parseFloat(data.reelle);
-      task.commentaire = data.commentaire || '';
-      task.termine = tasks.find(t => t.id === taskId)?.termine || 0;
-    } else if (userRole === 'assistant') {
-      const originalTask = tasks.find(t => t.id === taskId);
-      if (!originalTask) {
-        alert("Erreur : tâche introuvable !");
-        return;
-      }
-
-      // Conserver les champs non modifiables depuis la version originale
-      task.date = originalTask.date;
-      task.ouvrier = originalTask.ouvrier;
-      task.tache = originalTask.tache;
-      task.estimee = originalTask.estimee;
-      task.termine = originalTask.termine;
-
-      // Ajouter les champs modifiables par l'assistant
-      task.reelle = parseFloat(data.reelle);
-      task.commentaire = data.commentaire || '';
-    }
-  } else {
-    // Ajout d'une nouvelle tâche (admin ou assistant)
-    task.date = data.date;
-    task.ouvrier = data.ouvrier;
-    task.tache = data.tache;
-    task.estimee = parseFloat(data.estimee);
-    task.reelle = parseFloat(data.reelle);
-    task.commentaire = data.commentaire || '';
-    task.termine = false;
-  }
+  const task = {
+    id: isEditing ? parseInt(data.id) : null,
+    date: data.date,
+    ouvrier: data.ouvrier,
+    tache: data.tache,
+    estimee: parseFloat(data.estimee),
+    reelle: parseFloat(data.reelle),
+    commentaire: data.commentaire || '',
+    termine: isEditing ? tasks.find(t => t.id === parseInt(data.id))?.termine || false : false
+  };
   console.log('Submitting task:', task);
 
   fetch('./tasks.php', {
@@ -226,11 +195,8 @@ form.onsubmit = e => {
     .catch(error => console.error('Error saving task:', error));
 };
 
-
 taskTableBody.onclick = e => {
   const id = e.target.dataset.id;
-sk.termine = 0;
-  }
   if (e.target.matches('.view')) {
     console.log(`Viewing task ${id}`);
     const t = tasks.find(t => t.id === parseInt(id));
@@ -262,10 +228,10 @@ sk.termine = 0;
 
     if (userRole === 'assistant') {
       console.log('Setting fields read-only for assistant');
-      form.querySelector('[name="date"]').readOnly = false;
-      form.querySelector('[name="ouvrier"]').readOnly = false;
-      form.querySelector('[name="tache"]').readOnly = false;
-      form.querySelector('[name="estimee"]').readOnly = false;
+      form.querySelector('[name="date"]').readOnly = true;
+      form.querySelector('[name="ouvrier"]').readOnly = true;
+      form.querySelector('[name="tache"]').readOnly = true;
+      form.querySelector('[name="estimee"]').readOnly = true;
       form.querySelector('[name="reelle"]').readOnly = false;
       form.querySelector('[name="commentaire"]').readOnly = false;
     } else {
