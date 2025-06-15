@@ -174,7 +174,7 @@ form.onsubmit = e => {
     estimee: parseFloat(data.estimee),
     reelle: parseFloat(data.reelle),
     commentaire: data.commentaire || '',
-    termine: isEditing ? tasks.find(t => t.id === parseInt(data.id))?.termine || 0 : 0
+    termine: isEditing ? tasks.find(t => t.id === parseInt(data.id))?.termine || false : false
   };
   console.log('Submitting task:', task);
 
