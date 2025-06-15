@@ -9,7 +9,13 @@
 </head>
 <body>
     <div class="login-container">
+        <!-- Logo -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="logo.png" alt="Logo" style="max-width: 120px; height: auto;">
+        </div>
+
         <h2>Connexion</h2>
+
         <?php
         session_start();
         if (isset($_SESSION['error'])) {
@@ -17,6 +23,7 @@
             unset($_SESSION['error']);
         }
         ?>
+
         <form method="POST" action="login.php">
             <label for="username">Nom d'utilisateur:</label>
             <input type="text" id="username" name="username" required>
