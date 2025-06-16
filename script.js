@@ -169,7 +169,7 @@ form.onsubmit = e => {
   const isAssistant = userRole === 'assistant';
   const method = isEditing ? (isAssistant ? 'PUT' : 'POST') : 'POST';
   const task = isEditing && isAssistant
-  ? { id: parseInt(data.id), termine: tasks.find(t => t.id === parseInt(data.id))?.termine || false, reelle: parseFloat(data.reelle), commentaire: data.commentaire || '' }
+  ? { id: parseInt(data.id), termine: tasks.find(t => t.id === parseInt(data.id))?.termine || 0, reelle: parseFloat(data.reelle), commentaire: data.commentaire || '' }
   : {
     id: isEditing ? parseInt(data.id) : null,
     date: data.date,
