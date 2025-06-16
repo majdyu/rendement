@@ -166,65 +166,41 @@ form.onsubmit = e => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(form).entries());
   const isEditing = data.id !== '';
-  const taskId = isEditing ? parseInt(data.id) : null;
+  const isEditing = data.id !== '';
+const oldTask = tasks.find(t => t.id === parseInt(data.id));
 
-  if (isEditing && userRole === 'assistant') {
-    // Assistant ne peut modifier que reelle et commentaire
-    const task = {
-      id: taskId,
-      reelle: parseFloat(data.reelle),
-      commentaire: data.commentaire || ''
-    };
-    console.log('Assistant submitting edit:', task);
+const task = {
+    id: isEditing ? parseInt(data.id) : null,
+    reelle: parseFloat(data.reelle),
+    commentaire: data.commentaire || '',
+    termine: oldTask?.termine || 0
+  };
 
-    fetch('./tasks.php', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(task)
-    })
-      .then(response => {
-        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-        return response.json();
-      })
-      .then(data => {
-        console.log('Task updated by assistant:', data);
-        modal.style.display = 'none';
-        fetchTasks();
-      })
-      .catch(error => console.error('Error saving task:', error));
-
-  } else {
-    // Admin ou création de nouvelle tâche
-    const task = {
-      id: taskId,
-      date: data.date,
-      ouvrier: data.ouvrier,
-      tache: data.tache,
-      estimee: parseFloat(data.estimee),
-      reelle: parseFloat(data.reelle),
-      commentaire: data.commentaire || '',
-      termine: isEditing ? tasks.find(t => t.id === taskId)?.termine || 1 : 0
-    };
-    console.log('Admin submitting task:', task);
-
-    fetch('./tasks.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(task)
-    })
-      .then(response => {
-        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-        return response.json();
-      })
-      .then(data => {
-        console.log('Task saved:', data);
-        modal.style.display = 'none';
-        fetchTasks();
-      })
-      .catch(error => console.error('Error saving task:', error));
+  if (userRole === 'admin') {
+    task.date = data.date;
+    task.ouvrier = data.ouvrier;
+    task.tache = data.tache;
+    task.estimee = parseFloat(data.estimee);
   }
-};
 
+  console.log('Submitting task:', task);
+
+  fetch('./tasks.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(task)
+  })
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      console.log('Task saved:', data);
+      modal.style.display = 'none';
+      fetchTasks();
+    })
+    .catch(error => console.error('Error saving task:', error));
+};
 
 taskTableBody.onclick = e => {
   const id = e.target.dataset.id;
@@ -322,7 +298,7 @@ monthlyClose.onclick = () => monthlyModal.style.display = 'none';
 
 window.onclick = e => {
   if (e.target === modal) modal.style.display = 'none';
-  if (e.target === monthlyModal) monthlyModal.style.display = 'none'; // Corrigé
+  if (e.target === monthlyModal) monthlyModal.style.display = 'none';
   if (e.target === viewModal) viewModal.style.display = 'none';
 };
 
