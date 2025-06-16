@@ -92,19 +92,19 @@ switch ($method) {
         break;
 
     case 'PUT':
-        try {
-            $data = json_decode($requestData, true);
-            $id = (int)$data['id'];
-            $termine = (bool)$data['termine'];
-            $stmt = $pdo->prepare("UPDATE tasks SET termine = ? WHERE id = ?");
-            $stmt->execute([$termine, $id]);
-            echo json_encode(['success' => true]);
-        } catch (Exception $e) {
-            error_log("PUT Error: " . $e->getMessage());
-            http_response_code(500);
-            echo json_encode(['error' => $e->getMessage()]);
-        }
-        break;
+    try {
+        $data = json_decode($requestData, true);
+        $id = (int)$data['id'];
+        $termine = $data['termine'] ? 1 : 0;
+        $stmt = $pdo->prepare("UPDATE tasks SET termine = ? WHERE id = ?");
+        $stmt->execute([$termine, $id]);
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        error_log("PUT Error: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['error' => $e->getMessage()]);
+    }
+    break;
 
     case 'DELETE':
         try {
