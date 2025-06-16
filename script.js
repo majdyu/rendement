@@ -174,7 +174,7 @@ form.onsubmit = e => {
     estimee: parseFloat(data.estimee),
     reelle: parseFloat(data.reelle),
     commentaire: data.commentaire || '',
-    termine: isEditing ? tasks.find(t => t.id === parseInt(data.id))?.termine || false : false
+    termine: isEditing ? tasks.find(t => t.id === parseInt(data.id))?.termine || 1 : 0
   };
   console.log('Submitting task:', task);
 
@@ -228,10 +228,10 @@ taskTableBody.onclick = e => {
 
     if (userRole === 'assistant') {
       console.log('Setting fields read-only for assistant');
-      form.querySelector('[name="date"]').readOnly = false;
-      form.querySelector('[name="ouvrier"]').readOnly = false;
-      form.querySelector('[name="tache"]').readOnly = false;
-      form.querySelector('[name="estimee"]').readOnly = false;
+      form.querySelector('[name="date"]').readOnly = true;
+      form.querySelector('[name="ouvrier"]').readOnly = true;
+      form.querySelector('[name="tache"]').readOnly = true;
+      form.querySelector('[name="estimee"]').readOnly = true;
       form.querySelector('[name="reelle"]').readOnly = false;
       form.querySelector('[name="commentaire"]').readOnly = false;
     } else {
