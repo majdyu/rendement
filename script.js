@@ -168,28 +168,18 @@ form.onsubmit = e => {
   const isEditing = data.id !== '';
   const isAssistant = userRole === 'assistant';
   const method = isEditing ? (isAssistant ? 'PUT' : 'POST') : 'POST';
-
-  // Lire la valeur actuelle de la checkbox 'termine' dans le formulaire
-  const termineValue = form.querySelector('input[name="termine"]')?.checked || 0;
-
   const task = isEditing && isAssistant
-    ? {
-        id: parseInt(data.id),
-        termine: termineValue,  // <-- ici on prend la valeur modifiée
-        reelle: parseFloat(data.reelle),
-        commentaire: data.commentaire || ''
-      }
-    : {
-        id: isEditing ? parseInt(data.id) : null,
-        date: data.date,
-        ouvrier: data.ouvrier,
-        tache: data.tache,
-        estimee: parseFloat(data.estimee),
-        reelle: parseFloat(data.reelle),
-        commentaire: data.commentaire || '',
-        termine: termineValue  // ici aussi pour que la checkbox soit prise en compte
-      };
-
+  ? { id: parseInt(data.id), termine: tasks.find(t => t.id === parseInt(data.id))?.termine || 0, reelle: parseFloat(data.reelle), commentaire: data.commentaire || '' }
+  : {
+    id: isEditing ? parseInt(data.id) : null,
+    date: data.date,
+    ouvrier: data.ouvrier,
+    tache: data.tache,
+    estimee: parseFloat(data.estimee),
+    reelle: parseFloat(data.reelle),
+    commentaire: data.commentaire || '',
+    termine: isEditing ? tasks.find(t => t.id === parseInt(data.id))?.termine || false : false
+  };
   console.log('Submitting task:', task);
 
   fetch('./tasks.php', {

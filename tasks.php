@@ -92,25 +92,32 @@ switch ($method) {
         break;
 
     case 'PUT':
-        try {
-            $data = json_decode($requestData, true);
-            $id = (int)$data['id'];
-            $termine = isset($data['termine']) ? (int)((bool)$data['termine']) : 0;
-            $stmt = $pdo->prepare("UPDATE tasks SET termine = ? WHERE id = ?");
-            $stmt->execute([$termine, $id]);
+    try {
+        $data = json_decode($requestData, true);
+        $id = (int)$data['id'];
 
-            // Récupérer la tâche mise à jour
-            $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ?");
-            $stmt->execute([$id]);
-            $updatedTask = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Préparer les champs modifiables par l'assistant
+        $reelle = isset($data['reelle']) ? (float)$data['reelle'] : null;
+        $commentaire = $data['commentaire'] ?? null;
+        $termine = isset($data['termine']) ? (int)((bool)$data['termine']) : 0;
 
-            echo json_encode($updatedTask);
-        } catch (Exception $e) {
-            error_log("PUT Error: " . $e->getMessage());
-            http_response_code(500);
-            echo json_encode(['error' => $e->getMessage()]);
-        }
-        break;
+        // Mettre à jour reelle, commentaire, termine
+        $stmt = $pdo->prepare("UPDATE tasks SET reelle = ?, commentaire = ?, termine = ? WHERE id = ?");
+        $stmt->execute([$reelle, $commentaire, $termine, $id]);
+
+        // Récupérer la tâche mise à jour
+        $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ?");
+        $stmt->execute([$id]);
+        $updatedTask = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        echo json_encode($updatedTask);
+    } catch (Exception $e) {
+        error_log("PUT Error: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['error' => $e->getMessage()]);
+    }
+    break;
+
 
     case 'DELETE':
         try {
