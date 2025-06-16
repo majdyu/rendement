@@ -92,28 +92,28 @@ switch ($method) {
         break;
 
     case 'PUT':
-        try {
-            $data = json_decode($requestData, true);
-            $id = (int)$data['id'];
+    try {
+        $data = json_decode($requestData, true);
+        $id = (int)$data['id'];
 
-            $reelle = isset($data['reelle']) ? (float)$data['reelle'] : null;
-            $commentaire = $data['commentaire'] ?? null;
-            $termine = isset($data['termine']) ? (int)((bool)$data['termine']) : 0;
+        $reelle = isset($data['reelle']) ? (float)$data['reelle'] : null;
+        $commentaire = $data['commentaire'] ?? null;
+        $termine = isset($data['termine']) ? (int)((bool)$data['termine']) : 0;
 
-            $stmt = $pdo->prepare("UPDATE tasks SET reelle = ?, commentaire = ?, termine = ? WHERE id = ?");
-            $stmt->execute([$reelle, $commentaire, $termine, $id]);
+        $stmt = $pdo->prepare("UPDATE tasks SET reelle = ?, commentaire = ?, termine = ? WHERE id = ?");
+        $stmt->execute([$reelle, $commentaire, $termine, $id]);
 
-            $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ?");
-            $stmt->execute([$id]);
-            $updatedTask = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ?");
+        $stmt->execute([$id]);
+        $updatedTask = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            echo json_encode($updatedTask);
-        } catch (Exception $e) {
-            error_log("PUT Error: " . $e->getMessage());
-            http_response_code(500);
-            echo json_encode(['error' => $e->getMessage()]);
-        }
-        break;
+        echo json_encode($updatedTask);
+    } catch (Exception $e) {
+        error_log("PUT Error: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['error' => $e->getMessage()]);
+    }
+    break;
 
     case 'DELETE':
         try {
