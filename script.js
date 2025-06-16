@@ -166,6 +166,8 @@ form.onsubmit = e => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(form).entries());
   const isEditing = data.id !== '';
+  const isAssistant = userRole === 'assistant';
+  const method = isEditing ? (isAssistant ? 'PUT' : 'POST') : 'POST'; 
   const task = {
     id: isEditing ? parseInt(data.id) : null,
     date: data.date,
@@ -179,7 +181,7 @@ form.onsubmit = e => {
   console.log('Submitting task:', task);
 
   fetch('./tasks.php', {
-    method: 'POST',
+    method: method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(task)
   })
