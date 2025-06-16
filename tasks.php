@@ -92,35 +92,55 @@ switch ($method) {
         break;
 
     case 'PUT':
-    try {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $id          = (int)   $data['id'];
-        $reelle      = isset($data['reelle'])      ? (float)$data['reelle']      : null;
-        $commentaire = $data['commentaire'] ?? '';
-        $termine     = isset($data['termine'])     ? (int)((bool)$data['termine']) : 0;
+        try {
+            $data = json_decode($requestData, true);
+            $id = (int)$data['id'];
 
-        // Mise à jour des 3 champs autorisés
-        $stmt = $pdo->prepare(
-           "UPDATE tasks 
-               SET reelle      = ?, 
-                   commentaire = ?, 
-                   termine     = ? 
-             WHERE id = ?"
-        );
-        $stmt->execute([$reelle, $commentaire, $termine, $id]);
+            // Préparer les champs dynamiquement
+            $fields = [];
+            $values = [];
 
-        // Récupérer et renvoyer la tâche mise à jour
-        $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ?");
-        $stmt->execute([$id]);
-        $updatedTask = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (isset($data['reelle'])) {
+                $fields[] = "reelle = ?";
+                $values[] = (float)$data['reelle'];
+            }
 
-        echo json_encode($updatedTask);
-    } catch (Exception $e) {
-        error_log("PUT Error: " . $e->getMessage());
-        http_response_code(500);
-        echo json_encode(['error' => $e->getMessage()]);
-    }
-    break;
+            if (array_key_exists('commentaire', $data)) { // même si vide
+                $fields[] = "commentaire = ?";
+                $values[] = $data['commentaire'];
+            }
+
+            if (isset($data['termine'])) {
+                $fields[] = "termine = ?";
+                $values[] = (int)((bool)$data['termine']);
+            }
+
+            if (empty($fields)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Aucune donnée à mettre à jour.']);
+                break;
+            }
+
+            // Ajouter l'ID à la fin des valeurs
+            $values[] = $id;
+
+            // Construire et exécuter la requête dynamique
+            $sql = "UPDATE tasks SET " . implode(', ', $fields) . " WHERE id = ?";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($values);
+
+            // Récupérer la tâche mise à jour
+            $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ?");
+            $stmt->execute([$id]);
+            $updatedTask = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            echo json_encode($updatedTask);
+        } catch (Exception $e) {
+            error_log("PUT Error: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        break;
 
 
     case 'DELETE':

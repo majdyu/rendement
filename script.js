@@ -163,57 +163,41 @@ addBtn.onclick = () => {
 };
 
 form.onsubmit = e => {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(form).entries());
-    const isEditing    = data.id !== '';
-    const isAssistant  = userRole === 'assistant';
-    const method       = isEditing
-                        ? (isAssistant ? 'PUT' : 'POST')
-                        : 'POST';
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(form).entries());
+  const isEditing = data.id !== '';
+  const isAssistant = userRole === 'assistant';
+  const method = isEditing ? (isAssistant ? 'PUT' : 'POST') : 'POST';
+  const task = isEditing && isAssistant
+  ? { id: parseInt(data.id), termine: tasks.find(t => t.id === parseInt(data.id))?.termine || false, reelle: parseFloat(data.reelle), commentaire: data.commentaire || '' }
+  : {
+    id: isEditing ? parseInt(data.id) : null,
+    date: data.date,
+    ouvrier: data.ouvrier,
+    tache: data.tache,
+    estimee: parseFloat(data.estimee),
+    reelle: parseFloat(data.reelle),
+    commentaire: data.commentaire || '',
+    termine: isEditing ? tasks.find(t => t.id === parseInt(data.id))?.termine || false : false
+  };
+  console.log('Submitting task:', task);
 
-    // On prend la valeur actuelle de la checkbox dans le formulaire
-    const termineValue = form.querySelector('input[name="termine"]')?.checked
-                        ? 1
-                        : 0;
-
-    const task = isEditing && isAssistant
-      ? {
-          id: parseInt(data.id),
-          reelle:     parseFloat(data.reelle),
-          commentaire:data.commentaire || '',
-          termine:    termineValue
-        }
-      : {
-          // POST (nouvelle tâche ou admin-edit)
-          id:          isEditing ? parseInt(data.id) : null,
-          date:        data.date,
-          ouvrier:     data.ouvrier,
-          tache:       data.tache,
-          estimee:     parseFloat(data.estimee),
-          reelle:      parseFloat(data.reelle),
-          commentaire: data.commentaire || '',
-          termine:     termineValue
-        };
-
-    console.log('Submitting task:', task);
-
-    fetch('./tasks.php', {
-      method:  method,
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(task)
+  fetch('./tasks.php', {
+    method: method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(task)
+  })
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+      return response.json();
     })
-    .then(r => {
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.json();
-    })
-    .then(r => {
-      console.log('Task saved:', r);
+    .then(data => {
+      console.log('Task saved:', data);
       modal.style.display = 'none';
       fetchTasks();
     })
-    .catch(err => console.error('Error saving task:', err));
-  };
-
+    .catch(error => console.error('Error saving task:', error));
+};
 
 taskTableBody.onclick = e => {
   const id = e.target.dataset.id;
