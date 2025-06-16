@@ -167,8 +167,10 @@ form.onsubmit = e => {
   const data = Object.fromEntries(new FormData(form).entries());
   const isEditing = data.id !== '';
   const isAssistant = userRole === 'assistant';
-  const method = isEditing ? (isAssistant ? 'PUT' : 'POST') : 'POST'; 
-  const task = {
+  const method = isEditing ? (isAssistant ? 'PUT' : 'POST') : 'POST';
+  const task = isEditing && isAssistant
+  ? { id: parseInt(data.id), termine: tasks.find(t => t.id === parseInt(data.id))?.termine || false, reelle: parseFloat(data.reelle), commentaire: data.commentaire || '' }
+  : {
     id: isEditing ? parseInt(data.id) : null,
     date: data.date,
     ouvrier: data.ouvrier,
