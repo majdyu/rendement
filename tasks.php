@@ -95,7 +95,7 @@ switch ($method) {
     try {
         $data = json_decode($requestData, true);
         $id = (int)$data['id'];
-        $termine = $data['termine'] ? 1 : 0;
+        $termine = isset($data['termine']) ? (int)((bool)$data['termine']) : 0;
         $stmt = $pdo->prepare("UPDATE tasks SET termine = ? WHERE id = ?");
         $stmt->execute([$termine, $id]);
         echo json_encode(['success' => true]);
