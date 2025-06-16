@@ -166,23 +166,16 @@ form.onsubmit = e => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(form).entries());
   const isEditing = data.id !== '';
-  const isEditing = data.id !== '';
-const oldTask = tasks.find(t => t.id === parseInt(data.id));
-
-const task = {
+  const task = {
     id: isEditing ? parseInt(data.id) : null,
+    date: data.date,
+    ouvrier: data.ouvrier,
+    tache: data.tache,
+    estimee: parseFloat(data.estimee),
     reelle: parseFloat(data.reelle),
     commentaire: data.commentaire || '',
-    termine: oldTask?.termine || 0
+    termine: isEditing ? tasks.find(t => t.id === parseInt(data.id))?.termine || false : false
   };
-
-  if (userRole === 'admin') {
-    task.date = data.date;
-    task.ouvrier = data.ouvrier;
-    task.tache = data.tache;
-    task.estimee = parseFloat(data.estimee);
-  }
-
   console.log('Submitting task:', task);
 
   fetch('./tasks.php', {
