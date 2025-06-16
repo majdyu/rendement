@@ -95,13 +95,9 @@ switch ($method) {
         try {
             $data = json_decode($requestData, true);
             $id = (int)$data['id'];
-            $reelle = isset($data['reelle']) ? (float)$data['reelle'] : null;
-            $commentaire = $data['commentaire'] ?? '';
             $termine = isset($data['termine']) ? (int)((bool)$data['termine']) : 0;
-
-            // Met à jour uniquement les champs envoyés
-            $stmt = $pdo->prepare("UPDATE tasks SET reelle = ?, commentaire = ?, termine = ? WHERE id = ?");
-            $stmt->execute([$reelle, $commentaire, $termine, $id]);
+            $stmt = $pdo->prepare("UPDATE tasks SET termine = ? WHERE id = ?");
+            $stmt->execute([$termine, $id]);
 
             // Récupérer la tâche mise à jour
             $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ?");
