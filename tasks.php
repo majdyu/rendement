@@ -93,16 +93,23 @@ switch ($method) {
 
     case 'PUT':
     try {
-        $data = json_decode($requestData, true);
-        $id = (int)$data['id'];
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id          = (int)   $data['id'];
+        $reelle      = isset($data['reelle'])      ? (float)$data['reelle']      : null;
+        $commentaire = $data['commentaire'] ?? '';
+        $termine     = isset($data['termine'])     ? (int)((bool)$data['termine']) : 0;
 
-        $reelle = isset($data['reelle']) ? (float)$data['reelle'] : null;
-        $commentaire = $data['commentaire'] ?? null;
-        $termine = isset($data['termine']) ? (int)((bool)$data['termine']) : 0;
-
-        $stmt = $pdo->prepare("UPDATE tasks SET reelle = ?, commentaire = ?, termine = ? WHERE id = ?");
+        // Mise à jour des 3 champs autorisés
+        $stmt = $pdo->prepare(
+           "UPDATE tasks 
+               SET reelle      = ?, 
+                   commentaire = ?, 
+                   termine     = ? 
+             WHERE id = ?"
+        );
         $stmt->execute([$reelle, $commentaire, $termine, $id]);
 
+        // Récupérer et renvoyer la tâche mise à jour
         $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ?");
         $stmt->execute([$id]);
         $updatedTask = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -114,6 +121,7 @@ switch ($method) {
         echo json_encode(['error' => $e->getMessage()]);
     }
     break;
+
 
     case 'DELETE':
         try {
